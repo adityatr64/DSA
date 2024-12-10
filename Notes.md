@@ -2223,8 +2223,27 @@ int survivor(struct node **head, int n){
 - Conversion Thumb RULE:
   - `LEFT-CHILD ,RIGHT-SIBLING`
   - It's Easier to show
-  ![EXample](./images/EXamplep1.png)
+  ![](./images/EXamplep1.png)
   <Figure>↓</figure>
+  ![](./images/EXAMPLEp2.png)
+  <Figure>↓</figure>
+  ![](./images/EXAMPLEP3.png)
+  <Figure>↓</figure>
+  ![](./images/EXAMPLEP4.png)
+  <Figure>↓</figure>
+  ![](./images/EXAMPLEP5.png)
+  <Figure>↓</figure>
+  ![](./images/EXAMPLEP6.png)
+  <Figure>DONE</figure>
+- Surely Forests are diffrent
+<figure>**_NO_**</figure>
+- you convert each tree to binary tree then
+  - leave left alone add the sibling to right
+  ![EX](./images/forestexp1.png)
+    <Figure>↓</figure>
+  ![](./images/Forestp2.png)
+    <Figure>↓</figure>
+    ![](./images/forestfina.png)
 
 ---
 
