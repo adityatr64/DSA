@@ -1,3 +1,6 @@
 .vscode/
 *.zip
 *.html
+*.c
+*.cpp
+*.h
