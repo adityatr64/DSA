@@ -1,4 +1,5 @@
 <link rel="stylesheet" href="notes.css">
+<!-- Author: WIZ/Aditya -->
 
 # NOTES
 
@@ -22,9 +23,26 @@
       - [LL implementation](#ll-implementation)
       - [Structure implementation](#structure-implementation)
     - [Application of Stack](#application-of-stack)
+      - [Tower of Hanoi](#tower-of-hanoi)
       - [Infix to postfix](#infix-to-postfix)
       - [Infix to prefix](#infix-to-prefix)
       - [Check for balanced parenthesis](#check-for-balanced-parenthesis)
+  - [UNIT - 2](#unit---2)
+    - [Queue](#queue)
+      - [Array Implementation](#array-implementation-1)
+      - [Linked List Implementation](#linked-list-implementation)
+    - [Double Ended Queue](#double-ended-queue)
+    - [Circular Queue](#circular-queue)
+      - [Array Implementations](#array-implementations)
+    - [Priority Queue](#priority-queue)
+      - [Array Implementation](#array-implementation-2)
+      - [Linked List Implementation](#linked-list-implementation-1)
+    - [Applications of Queue](#applications-of-queue)
+      - [Josephus Problem](#josephus-problem)
+      - [CPU Scheduling](#cpu-scheduling)
+    - [Tree](#tree)
+      - [Binary Tree](#binary-tree)
+      - [N-ary Tree](#n-ary-tree)
 
 ---
 
@@ -381,6 +399,8 @@ void delete_last(DLIST *ptr_list)
 ```
 
 > If You want **explaination** for these code maybe stop cs engg and become prompt engg and <span class="highlight">**ASK GPT**</span>
+>
+> ⎛⎝(•ⱅ•)⎠⎞
 
 #### Circular Singly Linked List
 
@@ -732,6 +752,8 @@ void delete_node(CDLL *ptr_list, int data) {
 #### Array implementation
 
 > There is no need of structure in array implementation COS we use a <span class="highlight">**FUCKING ARRAY**</span>
+>
+> ⎛⎝(•ⱅ•)⎠⎞
 
 - Push Function
 
@@ -788,6 +810,8 @@ void display(int *s, int top, int size)
 ```
 
 > If Any of these Functions Confuse you <span class="highlight">_YOU ARE COOKED_</span>
+>
+> ⎛⎝(•ⱅ•)⎠⎞
 
 #### LL implementation
 
@@ -813,7 +837,7 @@ typedef struct stack
 } STACK;
 ```
 
-Anyways here's the code for the functions,you might but `WIZ` Where is the main function , To that i say **_fuck you_** make your own
+Anyways here's the code for the functions,you might but `WIZ` Where is the main function , To that i say **_fuck you_** make your own (◕‿◕✿)
 
 - INIT
 
@@ -825,8 +849,7 @@ void init(STACK *ptr)
 }
 ```
 
-> If you are wondering why do all this ,why extra init function?<br/>
-> WELL <br/>
+- If you are wondering why do all this ,why extra init function? _WELL_ <br/>
 
 - What if you have more than one stack or you don'y know how many you have yet
   <br/>- Thats why we do this
@@ -1009,6 +1032,35 @@ void display(STACK p)
 
 ### Application of Stack
 
+#### Tower of Hanoi
+
+- If a solution to n-1 disks is found, then the problem would be
+  solved. Because in the trivial case of one disk, the solution would
+  be to move the single disk from Peg A to Peg C.
+- To move n disks from A to C , the recursive solution would be as
+  follows
+
+  - If n=1 move the single disk from A to C and stop
+  - Move the top n-1 disks from A to B using C as auxillary
+  - Move the remaining disk from A to C
+  - Move n-1 disks from B to C using A as the auxillary
+    ![TOwer of hanoi](./images/TOH.png)
+
+```c
+void tower(int n,char src,char tmp,char dst)
+{
+    if(n==1)
+    {
+        printf("\nMove disk %d from %c to %c",n,src,dst);
+        return;
+    }
+    tower(n-1,src,dst,tmp);
+    printf("\nMove disk %d form %c to %c",n,src,dst);
+    tower(n-1,tmp,src,dst);
+    return;
+}
+```
+
 - Expressions consist of operands and operators. They can be categorized into three types:
 
   - Infix Notation
@@ -1153,7 +1205,7 @@ void convert_postfix(char *infix, char *postfix)
 }
 ```
 
-- ALOGORITHM FOR EVALUATING A POSTFIX EXPRESSION:
+- ALGORITHM FOR EVALUATING A POSTFIX EXPRESSION:
 
   1. Create a stack called input.
   2. Scan the input from 0 to len-1: L - R
@@ -1472,3 +1524,708 @@ int check_balance(char* exp) {
     return isEmpty(&S);
 }
 ```
+
+## UNIT - 2
+
+### Queue
+
+![Queue](./images/NQueue.png)
+
+> Look at the diagram i didn't draw in a few mins cos i couldn't find a good image on the web yea the <span class="highlight">top one is Array and the bottom is Linked List</span>
+>
+> ⎛⎝(•ⱅ•)⎠⎞
+
+#### Array Implementation
+
+![Normal Queue](./images/SQueue.png)
+
+- Enqueue Operation (Inserting an element)
+
+```c
+void enQ(int *q, int *rear, int ele) {
+    if (*rear == max - 1) {  // Check if the queue is full
+        printf("Queue is full\n");
+    } else {
+        // Increment the rear pointer
+        *rear = *rear + 1;
+        // Add the element to the rear of the queue
+        q[*rear] = ele;
+    }
+}
+```
+
+- Dequeue Operation (Removing an element)
+
+<figure>
+<figcaption>
+THIS IS **NOT** FUCKING DOUBLE ENDED you numbskull
+<figcaption>
+</figure>
+```c
+int deQ(int *q, int *front, int rear) {
+    if (*front > rear)  // Check if the queue is empty
+        return 0;  // Return 0 to indicate empty queue
+    else {
+        int x = q[*front];  // Store the element to be deleted
+        *front = *front + 1;  // Increment the front pointer
+        return x;  // Return the deleted element
+    }
+}
+```
+
+- Display
+
+```c
+  void display(int *q, int rear, int front) {
+    if (front > rear) {  // Check if the queue is empty
+        printf("Queue is empty\n");
+    } else {
+        for (int i = front; i <= rear; i++) {
+            // Display all elements from front to rear
+            printf("%d ", q[i]);
+        }
+    }
+}
+```
+
+#### Linked List Implementation
+
+![Linked List Queue](./images/SLLQ.png)
+
+- Again the same shenanigans
+
+```c
+typedef struct node
+{
+	int data;
+	struct node *link;
+} NODE;
+
+typedef struct queue
+{
+		NODE *front, *rear;
+} QUEUE;
+```
+
+- INIT
+
+```c
+QUEUE *createqueue()
+{
+    /* Allocate memory for a new queue*/
+    QUEUE *temp = (QUEUE *)malloc(sizeof(QUEUE));
+    if (temp != NULL)
+    {
+        // Initialize both front and rear to NULL (empty queue)
+        temp->front = temp->rear = NULL;
+    }
+    return (temp);  // Return the created queue
+}
+```
+
+- Enqueue
+
+```c
+void enqueue(QUEUE *ptr, int ele)
+{
+  // Allocate memory for a new node
+  NODE *temp = (NODE *)malloc(sizeof(NODE));
+  // Set the node's data to the input element
+  temp->data = ele;
+  // Set the node's link to NULL (end of the queue)
+  temp->link = NULL;
+
+  // If the queue is empty
+  if (ptr->front == NULL && ptr->rear == NULL)
+  {
+    // The new node becomes both the front and the rear
+    ptr->front = ptr->rear = temp;
+    return;
+  }
+
+  // Link the current rear node to the new node
+  ptr->rear->link = temp;
+  // Set the new node as the new rear of the queue
+  ptr->rear = temp;
+}
+```
+
+- Dequeue
+
+```c
+int dequeue(QUEUE *ptr)
+{
+  // If the queue is empty
+  if (ptr->front == NULL && ptr->rear == NULL)
+  {
+    return 0; // Return 0 to indicate the queue is empty
+  }
+  else
+  {
+    // Save the front node to be deleted
+    NODE *first = ptr->front;
+    // If the queue has only one element
+    if (first->link == NULL)
+    {
+      // Set the front to NULL
+      ptr->front = first->link;
+      // Save the data to return
+      int x = first->data;
+      // Free the memory of the first node
+      free(first);
+      // Set both to NULL (queue is empty)
+      ptr->front = ptr->rear = NULL;
+      // Return the deleted data
+      return (x);
+    }
+
+    ptr->front = first->link;
+    int x = first->data;// Save the data to return
+    free(first);        // Free the memory of the first node
+    return (x);         // Return the deleted data
+  }
+}
+```
+
+- Display
+
+```c
+void display(QUEUE *ptr)
+{
+    // If the queue is empty
+    if (ptr->front == NULL && ptr->rear == NULL)
+    {
+        printf("empty");
+    }
+    else
+    {
+        NODE *cur = ptr->front; // Start from the front node
+        while (cur != NULL)     // Traverse until the end
+        {
+            printf("%d\t", cur->data);
+            cur = cur->link;    // Move to the next node
+        }
+    }
+}
+```
+
+### Double Ended Queue
+
+![Double Ended Queue](./images/DLLQ.png)
+
+```c
+#include <stdlib.h>
+#include <stdio.h>
+
+struct node {
+    // Data stored in the node
+    int key;
+    // Pointers to the next and previous nodes
+    struct node *next, *prev;
+};
+
+typedef struct node NODE;    // Alias for struct node
+
+// Define the structure of the dequeue (double-ended queue)
+struct dequeue {
+    NODE *front;  // Pointer to the front node of the deque
+    NODE *rear;   // Pointer to the rear node of the deque
+};
+
+typedef struct dequeue DblQueue;  // Alias for struct dequeue
+```
+
+- INIT
+
+```c
+// Initialize the deque
+void init(DblQueue *p) {
+    // Set both front and rear to NULL (empty deque)
+    p->front = p->rear = NULL;
+}
+```
+
+- Insertion
+
+```c
+// Insert a node at the head (front) of the deque
+void qinsert_head(DEQ *p, int x) {
+    NODE *temp;
+
+    // Create a new node
+    temp = (NODE *)malloc(sizeof(NODE));
+    temp->key = x;
+    // Initialize the node's next and prev to NULL
+    temp->next = temp->prev = NULL;
+
+    // If deque is empty, set both front and rear to the new node
+    if (p->front == NULL)
+        p->front = p->rear = temp;
+    else {
+        // Link the new node's next to the current front
+        temp->next = p->front;
+        // Link the current front's prev to the new node
+        p->front->prev = temp;
+        // Update front to the new node
+        p->front = temp;
+    }
+}
+// Insert a node at the tail (rear) of the deque
+void qinsert_tail(DEQ *p, int x) {
+    NODE *temp;
+
+    // Create a new node
+    temp = (NODE *)malloc(sizeof(NODE));
+    temp->key = x;
+    // Initialize the node's next and prev to NULL
+    temp->next = temp->prev = NULL;
+
+    // If deque is empty, set both front and rear to the new node
+    if (p->front == NULL)
+        p->front = p->rear = temp;
+    else {
+        // Link the current rear's next to the new node
+        p->rear->next = temp;
+        // Link the new node's prev to the current rear
+        temp->prev = p->rear;
+        // Update rear to the new node
+        p->rear = temp;
+    }
+}
+```
+
+- Deletion
+
+```c
+// Delete a node from the tail (rear) of the deque
+int qdelete_tail(DEQ *p) {
+    NODE *pres;
+    int key;
+
+    // Check if deque is empty
+    if (p->rear == NULL) {
+        printf("Dequeue is empty\n");
+        return -1;
+    }
+
+    pres = p->rear;  // Current rear node
+    key = pres->key; // Store the key to return after deletion
+
+    // If only one node exists, set both front and rear to NULL
+    if (p->front == p->rear)
+        p->front = p->rear = NULL;
+    else {
+        // Move the rear pointer to the previous node
+        p->rear = pres->prev;
+        // Update the new rear's next pointer
+        p->rear->next = NULL;
+    }
+    free(pres);  // Free the deleted node
+    return key;  // Return the deleted value
+}
+// Delete a node from the head (front) of the deque
+int qdelete_head(DEQ *p) {
+    NODE *pres;
+    int key;
+
+    // Check if deque is empty
+    if (p->front == NULL) {
+        printf("Dequeue is empty\n");
+        return -1;
+    }
+
+    pres = p->front;  // Current front node
+    key = pres->key;  // Store the key to return after deletion
+
+    // If only one node exists, set both front and rear to NULL
+    if (p->front == p->rear)
+        p->front = p->rear = NULL;
+    else {
+        // Move the front pointer to the next node
+        p->front = pres->next;
+        // Update the new front's prev pointer
+        p->front->prev = NULL;
+    }
+    free(pres);  // Free the deleted node
+    return key;  // Return the deleted value
+}
+```
+
+- Display
+
+```c
+// Display the contents of the deque
+void qdisplay(DEQ *p) {
+    NODE *pres;
+
+    // Check if deque is empty
+    if (p->front == NULL)
+        printf("Empty Dequeue\n");
+    else {
+        pres = p->front;  // Start from the front
+
+        // Traverse the deque and print each node's key
+        while (pres != p->rear) {
+            printf("%d<->", pres->key);
+            pres = pres->next;
+        }
+        printf("%d\n", pres->key);  // Print the last node
+    }
+}
+```
+
+### Circular Queue
+
+![Circular Queue](./images/Cqu.png)
+
+> OK So pes gave me only array code so my advice is to use the circular linked list implementation for this one [Circular Singly Linked List](#circular-singly-linked-list)
+>
+> ⎛⎝(•ⱅ•)⎠⎞
+
+#### Array Implementations
+
+- Insertion
+
+```c
+int qinsert(int *q, int *f, int *r, int size, int x) {
+    // Check if the queue is full
+    if ((*r + 1) % size == *f) {
+        printf("Queue full.. cannot insert\n");
+        return -1;
+    }
+
+    // Update the rear pointer and insert the element
+    *r = (*r + 1) % size;
+    q[*r] = x;
+
+    // If the queue was empty, update the front pointer
+    if (*f == -1)
+        *f = 0;
+
+    return 1;
+}
+```
+
+- Deletion
+
+```c
+int qdelete(int *q, int *f, int *r, int size) {
+    int x;
+
+    // Check if the queue is empty
+    if (*f == -1) {
+        printf("Empty queue..\n");
+        return -1;
+    }
+
+    // Retrieve the element at the front
+    x = q[*f];
+
+    // If only one element was present, reset front and rear to -1
+    if (*f == *r)
+        *f = *r = -1;
+    else
+        *f = (*f + 1) % size;  // Move front forward modulo size
+
+    return x;
+}
+```
+
+- Display
+
+```c
+void display(int *q, int f, int r, int size) {
+    // Check if the queue is empty
+    if (f == -1)
+        printf("Queue empty..\n");
+    else {
+        // Traverse the queue from front to rear
+        while (f != r) {
+            printf("%d ", q[f]);
+            f = (f + 1) % size;
+        }
+        // Print the last element
+        printf("%d ", q[f]);
+    }
+}
+```
+
+### Priority Queue
+
+#### Array Implementation
+
+- In a priority queue:
+
+  - Elements are inserted in such a way that the queue maintains a specific order.
+  - The element with the highest priority (lowest value in this case) is always at the front of the queue.
+
+- Enqueue
+
+```c
+void enqueue(int q[], int *rear, int *front, int ele) {
+    int pos;
+
+    if (*rear == MAX - 1) {  // Check if the queue is full
+        printf("Overflow condition\n");
+    } else {
+        pos = *rear;    // Start from the last element
+        (*rear)++;      /* Increment the rear pointer to
+                         create space for the new element*/
+        // Shift larger elements to the right
+        while (pos >= 0 && q[pos] >= ele) {
+            q[pos + 1] = q[pos];
+            pos--;
+        }
+
+        // Insert the new element in the correct position
+        q[pos + 1] = ele;
+
+        // If the queue was empty, update the front pointer
+        if (*front == -1) {
+            *front = 0;
+        }
+    }
+}
+```
+
+- Dequeue
+
+```c
+int dequeue(int q[], int *f, int *r) {
+    int x;
+
+    if (*f == -1 || *f > *r) {// Check if the queue is empty
+        // Special value to indicate underflow
+        return 9999;
+    } else {
+        x = q[*f];            // Retrieve the element at the front
+        (*f)++;               // Increment the front pointer
+
+        // Reset the queue if all elements are dequeued
+        if (*f > *r) {
+            *f = -1;
+            *r = -1;
+        }
+        return x;               // Return the dequeued element
+    }
+}
+```
+
+- Display
+
+```c
+void display(int q[], int r, int f) {
+    // Check if the queue is empty
+    if (f == -1 || f > r) {
+        printf("Underflow condition\n");
+    } else {
+        // Traverse from front to rear
+        for (int i = f; i <= r; i++) {
+            printf("%d\t", q[i]);
+        }
+        printf("\n");
+    }
+}
+```
+
+#### Linked List Implementation
+
+- Helpers
+
+```c
+PQ* createPriorityQueue() {
+    PQ* pq = (PQ*)malloc(sizeof(PQ));
+    pq->front = NULL;
+    return pq;
+}
+int isEmpty(PQ* pq) {
+    return pq->front == NULL;
+}
+NODE* createNode(int data, int priority) {
+    NODE* temp = (NODE*)malloc(sizeof(NODE));
+    temp->data = data;
+    temp->priority = priority;
+    temp->next = NULL;
+    return temp;
+}
+```
+
+- Insertion
+
+```c
+void enqueue(PQ* pq, int data, int priority) {
+    NODE* temp = createNode(data, priority);
+
+    if (isEmpty(pq) || pq->front->priority > priority) {
+        temp->next = pq->front;
+        pq->front = temp;
+    } else {
+        NODE* p = pq->front;
+        while (p->next != NULL && p->next->priority <= priority) {
+            p = p->next;
+        }
+        temp->next = p->next;
+        p->next = temp;
+    }
+}
+```
+
+- Deletion
+
+```c
+int dequeue(PQ* pq) {
+    if (isEmpty(pq)) {
+        printf("Priority queue is empty.\n");
+        return -1;
+    }
+    NODE* temp = pq->front;
+    pq->front = pq->front->next;
+    int data = temp->data;
+    free(temp);
+    return data;
+}
+```
+
+- Display
+
+```c
+void display(PQ* pq) {
+    if (isEmpty(pq)) {
+        printf("Priority queue is empty.\n");
+        return;
+    }
+
+    NODE* p = pq->front;
+    printf("Priority Queue: ");
+    while (p != NULL) {
+        printf("%d (Priority: %d) -> ", p->data, p->priority);
+        p = p->next;
+    }
+    printf("NULL\n");
+}
+```
+
+### Applications of Queue
+
+#### Josephus Problem
+
+- Beginning with the soldier whose name is picked , they begin to count
+  clockwise around the circle. when the count reaches n, that soldier is
+  removed from the circle and the count begins with the next soldier.
+
+- The process continues so that each time the count reaches n, another
+  soldier is removed from the circle. Any soldier removed from the
+  circle is no longer counted. The last soldier remaining is to take the
+  horse and escape.
+
+  - Data structure used is a circular list where each node represents
+    one soldier
+
+  - To represent the removal of a soldier form the circle, a node is
+    deleted from the circular list.
+
+  - Finally one node remains on the list and the result is
+    determined
+
+> Assume the rest of Circular queue from above
+>
+> ⎛⎝(•ⱅ•)⎠⎞
+
+```c
+int survivor(struct node **head, int n){
+  // head is pointer to first node
+  struct node *p, *q;
+  int i;
+  q = p = *head;
+  while (p->next != p)
+  {
+    for (i = 0; i < n - 1; i++)
+    {
+      q = p;
+      p = p->next;
+    }
+    q->next = p->next;
+    printf("%d has been killed.\n", p->num);
+    free(p);
+    p = q->next;
+  }
+  *head = p;
+  return (p->num);
+}
+```
+
+#### CPU Scheduling
+
+- First Come First Serve CPU Scheduling:
+  - Simplest scheduling algorithm that schedules according to arrival times of
+    processes.
+  - First come first serve scheduling algorithm states that the process that
+    requests the CPU first is allocated the CPU.
+  - It is implemented by using the simple queue. When a process enters the
+    ready queue, its PCB is linked onto the rear of the queue.
+  - When the CPU is free, it is allocated to the process at the front of the
+    queue.
+  - The running process is then removed from the queue.
+- Shortest Job First:
+  - **Premptive**:
+    - In Preemptive Shortest Job First Scheduling, jobs are put into the ready queue as they arrive
+    - As a process with short burst time arrives, the existing process is preempted or removed from execution, and the shorter job is executed first
+  - **Non-Premptive**:
+    - In Non-Preemptive Shortest Job First, a process which has the shortest burst time is scheduled first.
+    - If two processes have the same bust time then FCFS is used to break the tie
+- Long Job First
+  - **Premptive**:
+    - It is similar to an Shortest Job First scheduling(SJF) algorithm.
+    - In this scheduling algorithm, priority is given to the process having the largest burst time remaining.
+  - **Non-Premptive**:
+    - It is similar to an SJF scheduling algorithm. But, in this scheduling algorithm, priority is given to the process having the longest burst time.
+    - This is non-preemptive in nature i.e., when any process starts executing, can’t be interrupted before complete execution.
+- Round Robin Scheduling:
+
+  - To implement Round Robin scheduling, The processes are kept in the queue of processes.
+  - New processes are added to the rear of the simple queue. The CPU scheduler picks the first process from the ready queue, sets a timer to interrupt after 1-time quantum, and dispatches the process.
+
+  - The process may have a CPU burst of less than 1-time quantum. In this case, the process itself will release the CPU voluntarily. The scheduler will then proceed to the next process in the ready queue.
+
+  - Otherwise, if the CPU burst of the currently running process is longer than 1-time quantum, the timer will go off and will cause an interrupt to the operating system.
+
+  - A context switch will be executed, and the process is put at the rear of the ready queue. The CPU scheduler will then select the next process in the ready queue.
+  - **Premptive**:
+    - In Preemptive Priority Scheduling, at the time of arrival of a process in the ready queue, its priority is compared with the priority of the other processes present in the ready queue as well as with the one which is being executed by the CPU at that point of time.
+    - The One with the highest priority among all the available processes will be given the CPU next.
+  - **Non-Premptive**:
+    - In the Non Preemptive Priority scheduling, The Processes are scheduled according to the priority number assigned to them.
+    - Once the process gets scheduled, it will run till the completion
+
+### Tree
+
+#### Binary Tree
+
+![Binary Tree](./images/BT.png)
+
+![Info](./images/BTinfo.png)
+![SvsN](./images/SvsN.png)
+
+![Fully Binary Tree](./images/Fbt.png)
+
+- Traversal
+
+![Pre Order](./images/PREORDER.png)
+
+![In Order](./images/Inorder.png)
+
+![Post Order](./images/POSTORDER.png)
+
+#### N-ary Tree
+
+- So basically a non binary tree `ಠ__ಠ`
+  ![N-ary Tree](./images/NARY.png)
+- Conversion Thumb RULE:
+  - `LEFT-CHILD ,RIGHT-SIBLING`
+  - It's Easier to show
+  ![EXample](./images/EXamplep1.png)
+  <Figure>↓</figure>
+
+---
+
+**Author**: WIZ/Aditya

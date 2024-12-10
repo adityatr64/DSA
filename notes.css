@@ -79,6 +79,7 @@ img:hover {
 /* Optional: Add captions for images */
 figure {
   text-align: center;
+  font-size: 1.5em;
   margin: 20px auto;
 }
 
