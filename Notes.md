@@ -21,6 +21,10 @@
       - [Array implementation](#array-implementation)
       - [LL implementation](#ll-implementation)
       - [Structure implementation](#structure-implementation)
+    - [Application of Stack](#application-of-stack)
+      - [Infix to postfix](#infix-to-postfix)
+      - [Infix to prefix](#infix-to-prefix)
+      - [Check for balanced parenthesis](#check-for-balanced-parenthesis)
 
 ---
 
@@ -932,6 +936,14 @@ void init(STACK *stk, int size)
 }
 ```
 
+- IS EMPTY
+
+```c
+int isEmpty(STACK *stk) {//returns true or false
+    return stk->top == -1;
+}
+```
+
 - Push
 
 ```c
@@ -995,10 +1007,337 @@ void display(STACK p)
 }
 ```
 
-<!-- ### Application of Stack
+### Application of Stack
+
+- Expressions consist of operands and operators. They can be categorized into three types:
+
+  - Infix Notation
+  <pre>
+      Format: <op> <opr> <op>
+      Example: A + B
+  </pre>
+  - Prefix Notation
+    <pre>
+      Format: <opr> <op> <op>
+      Example: +AB
+  </pre>
+  - Postfix Notation
+    <pre>
+        Format: <op> <op> <opr>
+        Example: AB+
+    </pre>
 
 #### Infix to postfix
 
+- ALGORITHM FOR INFIX to POSTFIX:
+  - Input is the token of the infix expression - char array
+    1.  Create an empty stack called opstack for keeping operators.
+    2.  Create an empty array for the output.
+    3.  Scan the input array from L-R
+        - If the token is an operand, add it to the output array.
+        - If the token is a left paranthesis (, push it on to the stack.
+        - IF the token is a right paranthesis ) , pop the stack until the
+          corresponding left paranthesis is found. Add all the operators to the
+          end of the output array.
+        - If the token is an operator`*,/,+,(,-` push it on to stack.
+          However, first remove any operator already on the stack that has higher
+          or equal precedence and add them to the output array.
+    4.  When the input is completely processed, check the stack for any leftover
+        operators. Pop them to the end of the output array.
+- Here the code for implementation
+
+```c
+int main()
+{
+    char infix[10], postfix[10];
+    printf("\nEnter valid Infix Expression\n");
+    scanf("%s", infix);
+    convert_postfix(infix, postfix);
+    printf("\nThe postfix equivalent=%s\n", postfix);
+}
+```
+
+- Stack precendence
+
+```c
+int stack_prec(char ch)
+{
+    switch (ch)
+    {
+        case '+':
+        case '-':
+            // Lower precedence for addition and subtraction
+            return 2;
+        case '*':
+        case '/':
+            // Higher precedence for multiplication and division
+            return 4;
+        case '(':
+            // Opening parenthesis has the lowest precedence
+            return 0;
+        case '#':
+            // Marker for the bottom of the stack
+            return -1;
+        default:
+            // Default for operands and unknown characters
+            return 6;
+    }
+}
+```
+
+- Input Precendence
+
+```c
+int input_prec(char ch)
+{
+    switch (ch)
+    {
+        case '+':
+        case '-':
+            // Lowest precedence for addition and subtraction
+            return 1;
+        case '*':
+        case '/':
+            // Higher precedence for multiplication and division
+            return 3;
+        case '(':
+            // Highest precedence for opening parenthesis
+            return 7;
+        case ')':
+            // Low precedence for closing parenthesis
+            return 0;
+        default:
+            // Default for operands (numbers, variables)
+            return 5;
+    }
+}
+```
+
+- Conversion code
+
+```c
+void convert_postfix(char *infix, char *postfix)
+{
+    int i, j;
+    char ch;
+    char s[10]; // stack
+    int top = -1;
+    i = 0;
+    j = 0;
+    push(s, &top, '#'); // push # to stack as initial marker
+
+    while (infix[i] != '\0')
+    {
+        ch = infix[i];
+
+        /* Pop stack until a lower precedence operator
+        or open parenthesis is found */
+        while (stack_prec(s[top]) > input_prec(ch))
+            postfix[j++] = pop(s, &top);
+
+        /* Push the current operator
+        if it has higher precedence than the stack top */
+        if (input_prec(ch) > stack_prec(s[top]))
+            push(s, &top, ch);
+        else
+            pop(s, &top); // Pop the stack for parenthesis
+
+        i++;
+    }
+
+    // Pop remaining operators in the stack to the output
+    while (s[top] != '#')
+        postfix[j++] = pop(s, &top);
+
+    postfix[j] = '\0'; // Null-terminate the postfix string
+}
+```
+
+- ALOGORITHM FOR EVALUATING A POSTFIX EXPRESSION:
+
+  1. Create a stack called input.
+  2. Scan the input from 0 to len-1: L - R
+  3. if token is an operand.
+     push it on to the input stack.
+  4. Otherwise, if the token is an operator
+     pop the first two elements on the stack and perform the operation
+     based on the operator.
+     push the result back onto the stack.
+  5. return the top most element -> result of evaluating the postfix exp.
+
+```c
+int main() {
+    char postfix[100];
+    printf("\nEnter the postfix expression\n");
+    scanf("%s", postfix);
+
+    int result = postfix_eval(postfix);
+    printf("\nThe result = %d\n", result);
+
+    return 0;
+}
+```
+
+```c
+int isoper(char ch) {
+    //checks if it is a operator and returns true or false
+    if ((ch == '+') || (ch == '-') || (ch == '*') || (ch == '/'))
+        return 1;
+    return 0;
+}
+```
+
+- Eval Function
+
+```c
+int postfix_eval(char* postfix) {
+  int isoper(char);
+  int i = 0, result, op1, op2, a;
+  char ch;
+  stack st; // Initialize a stack
+  init_stk(&st);
+  // Process each character in the postfix expression
+  while (postfix[i] != '\0') {
+     ch = postfix[i];
+       if (isoper(ch))
+      {                 // If the character is an operator
+         op1 = pop(&st); // Pop two operands
+         op2 = pop(&st);
+            // Perform the operation and push the result back
+        switch (ch) {
+           case '+': result = op2 + op1; push(&st, result); break;
+           case '-': result = op2 - op1; push(&st, result); break;
+           case '*': result = op2 * op1; push(&st, result); break;
+           case '/': result = op2 / op1; push(&st, result); break;
+        }
+      }
+      else { // If the character is an operand
+          printf("%c = ", ch);
+          scanf("%d", &a); // Read the value of the operand
+          push(&st, a);
+      }
+      i++;
+  }
+  return pop(&st); // Return the final result
+}
+```
+
 #### Infix to prefix
 
-#### Check for balanced parenthesis -->
+- Algorithm: Infix to Prefix Conversion
+  - Step 1: Input the Infix Expression
+    - Read the infix expression (e.g., A+B\*(C-D)).
+  - Step 2: Reverse the Infix Expression
+    - Reverse the input expression and swap parentheses:
+      - Replace ( with ) and vice versa.
+      - Example: A+B*(C-D) → Reversed → )D-C(*B+A.
+  - Step 3: Convert Reversed Infix to Postfix
+    - Use the Shunting Yard algorithm with a stack to convert the reversed infix expression to postfix.
+    - Details of Infix to Postfix Conversion
+      - Initialize a stack:
+        - Push a sentinel value (#) onto the stack to signify the bottom of the stack.
+      - Scan the reversed infix expression from left to right:
+        - For each operand (A, B, C, ...):
+          - Append it to the postfix expression.
+        - For each operator (+, -, \*, /, ...):
+          - Pop operators from the stack to the postfix expression while the operator's precedence on the stack is greater or equal to the incoming operator's precedence.
+          - Push the incoming operator onto the stack.
+        - For parentheses:
+          - Push ( onto the stack when encountered.
+          - Pop operators from the stack to the postfix expression until ) is found, then discard the ).
+        - Pop remaining operators from the stack:
+          - Append them to the postfix expression until the sentinel (#) is reached.
+        - Result:
+          - The output is the postfix equivalent of the reversed infix expression.
+  - Step 4: Reverse the Postfix Expression
+    - Reverse the postfix expression to get the prefix equivalent.
+      - Example: Postfix → ABCD-*+ → Reversed → +A*B-CD.
+  - Step 5: Output the Prefix Expression
+    - Display the resulting prefix expression.
+- Example Walkthrough
+
+  - Input:
+    - Infix Expression: `A+B*(C-D)`
+
+---
+
+- Reverse and Adjust Parentheses:
+
+  1. Infix: `A+B*(C-D)`
+  2. Reversed: `)D-C(*B+A`
+
+- Convert to Postfix:
+
+  1. Reversed Infix: `)D-C(*B+A`
+
+  - Postfix Conversion:
+    - Scan `)` → Push onto stack.
+    - Scan `D` → Append to postfix: `D`.
+    - Scan `-` → Push onto stack.
+    - Scan `C` → Append to postfix: `D C`.
+    - Scan `(` → Pop operators to postfix until `)` is encountered: `D C -`.
+    - Scan `*` → Push onto stack.
+    - Scan `B` → Append to postfix: `D C - B`.
+    - Scan `+` → Push onto stack (lower precedence than `*`).
+    - Scan A → Append to postfix: `D C - B * A`.
+  - Resulting Postfix:` D C - B * A +`
+
+- Reverse the Postfix:
+
+  - Postfix: `D C - B * A +`
+  - Reversed: `+ A * B - C D`
+
+- Output the Prefix Expression:
+  - Prefix: +A\*B-CD.
+
+#### Check for balanced parenthesis
+
+- Some helpers:
+
+```c
+// Function to return the top element of the stack
+char topmost(stack* S) {
+    if (!isEmpty(S)) {
+        return S->items[S->top];
+    }
+    return '\0';
+}
+/* Function to check whether two characters
+are opening and closing of the same type    */
+int arePair(char opening, char closing) {
+    if (opening == '(' && closing == ')') return 1;
+    else if (opening == '{' && closing == '}') return 1;
+    else if (opening == '[' && closing == ']') return 1;
+    return 0;
+}
+```
+
+- Checker
+
+```c
+// Function to check whether the parentheses are balanced
+int check_balance(char* exp) {
+    stack S;
+    initStack(&S);
+
+    for (int i = 0; i < strlen(exp); i++) {
+        // Push opening brackets onto the stack
+        if (exp[i] == '(' || exp[i] == '{' || exp[i] == '[') {
+            push(&S, exp[i]);
+        }
+        /* For closing brackets,
+        check if they match the top of the stack*/
+        else if (exp[i] == ')' || exp[i] == '}' || exp[i] == ']')
+        {
+            if (isEmpty(&S) || !arePair(topmost(&S), exp[i])) {
+                return 0; // Not balanced
+            } else {
+                pop(&S); // Match found, pop the stack
+            }
+        }
+    }
+
+    // If stack is empty, all parentheses were matched
+    return isEmpty(&S);
+}
+```
