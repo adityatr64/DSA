@@ -1226,32 +1226,31 @@ int postfix_eval(char* postfix) {
 
 - Algorithm: Infix to Prefix Conversion
   - Step 1: Input the Infix Expression
-    - Read the infix expression (e.g., A+B\*(C-D)).
+    - Read the infix expression (e.g., `A+B\*(C-D)`).
   - Step 2: Reverse the Infix Expression
     - Reverse the input expression and swap parentheses:
-      - Replace ( with ) and vice versa.
-      - Example: A+B*(C-D) → Reversed → )D-C(*B+A.
+      - Replace `(` with `)` and vice versa.
+      - Example: `A+B*(C-D)` → Reversed → `(D-C)*B+A`.
   - Step 3: Convert Reversed Infix to Postfix
-    - Use the Shunting Yard algorithm with a stack to convert the reversed infix expression to postfix.
     - Details of Infix to Postfix Conversion
       - Initialize a stack:
-        - Push a sentinel value (#) onto the stack to signify the bottom of the stack.
+        - Push a sentinel value `#` onto the stack to signify the bottom of the stack.
       - Scan the reversed infix expression from left to right:
-        - For each operand (A, B, C, ...):
+        - For each operand `A, B, C, ...`:
           - Append it to the postfix expression.
-        - For each operator (+, -, \*, /, ...):
+        - For each operator `+, -, *, /, ...`:
           - Pop operators from the stack to the postfix expression while the operator's precedence on the stack is greater or equal to the incoming operator's precedence.
           - Push the incoming operator onto the stack.
         - For parentheses:
-          - Push ( onto the stack when encountered.
-          - Pop operators from the stack to the postfix expression until ) is found, then discard the ).
+          - Push `(` onto the stack when encountered.
+          - Pop operators from the stack to the postfix expression until `)` is found, then discard the `)`.
         - Pop remaining operators from the stack:
-          - Append them to the postfix expression until the sentinel (#) is reached.
+          - Append them to the postfix expression until the sentinel `#` is reached.
         - Result:
           - The output is the postfix equivalent of the reversed infix expression.
   - Step 4: Reverse the Postfix Expression
     - Reverse the postfix expression to get the prefix equivalent.
-      - Example: Postfix → ABCD-*+ → Reversed → +A*B-CD.
+      - Example: Postfix → `DC-B*A+` → Reversed → `+A*B-CD`.
   - Step 5: Output the Prefix Expression
     - Display the resulting prefix expression.
 - Example Walkthrough
@@ -1264,22 +1263,23 @@ int postfix_eval(char* postfix) {
 - Reverse and Adjust Parentheses:
 
   1. Infix: `A+B*(C-D)`
-  2. Reversed: `)D-C(*B+A`
+  2. Reversed: `(D-C)*B+A`
 
 - Convert to Postfix:
 
-  1. Reversed Infix: `)D-C(*B+A`
+  1. Reversed Infix: `(D-C)*B+A`
 
   - Postfix Conversion:
-    - Scan `)` → Push onto stack.
+    - Scan `(` → Push onto stack.
     - Scan `D` → Append to postfix: `D`.
     - Scan `-` → Push onto stack.
     - Scan `C` → Append to postfix: `D C`.
-    - Scan `(` → Pop operators to postfix until `)` is encountered: `D C -`.
+    - Scan `)` → Pop operators to postfix until `(` is encountered: `D C -`.
     - Scan `*` → Push onto stack.
     - Scan `B` → Append to postfix: `D C - B`.
     - Scan `+` → Push onto stack (lower precedence than `*`).
-    - Scan A → Append to postfix: `D C - B * A`.
+    - Scan `A` → Append to postfix: `D C - B * A`.
+    - Scan `\0`→ Pop The rest of the Stack
   - Resulting Postfix:` D C - B * A +`
 
 - Reverse the Postfix:
@@ -1288,7 +1288,138 @@ int postfix_eval(char* postfix) {
   - Reversed: `+ A * B - C D`
 
 - Output the Prefix Expression:
-  - Prefix: +A\*B-CD.
+  - Prefix: `+A\*B-CD`.
+
+```c
+void reverse_string(char *a, char *b) {
+    int i = strlen(a) - 1, j = 0;
+
+    // Loop through the string backward
+    while (i >= 0) {
+        if (a[i] == '(')
+            b[j++] = ')';
+        else if (a[i] == ')')
+            b[j++] = '(';
+        else
+            b[j++] = a[i]; // Copy other characters
+        i--;
+    }
+
+    // Null-terminate the reversed string
+    b[j] = '\0';
+}
+```
+
+```c
+int main()
+{
+  char infix[100],prefix[100], reverse[100],postfix[100];
+
+  // Get infix expression input from the user
+  printf("\nEnter valid Infix Expression\n");
+  scanf("%s",infix);
+
+  /* Reverse the infix expression and
+  store it in the 'reverse' array     */
+  reverse_string(infix, reverse);
+  printf("Reversed = %s\n", reverse);
+
+  // Convert the reversed infix expression to a postfix expression
+  convert_postfix(reverse, postfix);
+  printf("\npostfix equivalent = %s",postfix);
+
+  // Reverse the postfix expression to get the prefix expression
+  reverse_string(postfix, prefix);
+  printf("\nThe prefix equivalent=%s\n",prefix);
+}
+```
+
+- Precedence Function
+
+```c
+int input_prec(char ch)
+{
+    switch(ch)
+    {
+        case '+':
+        case '-': return 2;
+        // Lower precedence for '+' and '-' compared to postfix
+        case '*':
+        case '/': return 4;
+        // Higher precedence for '*' and '/' compared to postfix
+        case '(': return 7;
+        // '(' has the highest precedence when it is the input
+        case ')': return 0;
+        // ')' has the lowest precedence when it is the input
+        default: return 5;
+        // For operands (like variables), precedence is constant
+    }
+}
+/* Function to return the stack precedence of the operator */
+int stack_prec(char ch)
+{
+    switch(ch)
+    {
+        case '+':
+        case '-': return 1;
+        // Stack precedence is lower for '+' and '-'
+        case '*':
+        case '/': return 3;
+        // Stack precedence is lower for '*' and '/'
+        case '(': return 0;
+        // '(' has the lowest precedence when it is on the stack
+        case '#': return -1;
+        // Sentinel value '#' has the lowest precedence
+        default: return 6;
+        // For operands (like variables), precedence is constant
+    }
+}
+```
+
+- Convert To Postfix
+
+```c
+/* Function to convert infix to postfix expression */
+void convert_postfix(char *infix, char *postfix)
+{
+    char s[100]; // Stack to hold operators and parentheses
+    int top = -1, i, j;
+    i = 0;
+    char ch;
+    j = 0;
+
+    // Push '#' onto the stack as a sentinel value
+    push(s, &top, '#');
+
+    // Loop through the infix expression from left to right
+    while(infix[i] != '\0')
+    {
+        ch = infix[i];
+
+        /* Pop from the stack
+        if input precedence is lower than stack precedence*/
+        while(input_prec(ch) < stack_prec(peep(s, top)))
+            postfix[j++] = pop(s, &top);
+
+        /* Push to the stack
+        if input precedence is higher than stack precedence*/
+        if(input_prec(ch) > stack_prec(peep(s, top)))
+            push(s, &top, ch);
+        else
+// If the precedence is equal, this happens when ')' matches '('
+            pop(s, &top);
+        i++;
+    }
+
+    /* Pop remaining operators from the stack
+     and store in postfix expression*/
+    while(peep(s, top) != '#')
+        postfix[j++] = pop(s, &top);
+
+    // Null-terminate the postfix string
+    postfix[j] = '\0';
+}
+```
 
 #### Check for balanced parenthesis
 
