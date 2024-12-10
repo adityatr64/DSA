@@ -1,0 +1,123 @@
+body {
+  background-color: #1e1e2e; /* Dark background */
+  color: #cdd6f4; /* Light text */
+  font-family: Arial, sans-serif;
+  line-height: 1.6;
+}
+html {
+  background-color: #1e1e2e; /* Dark background */
+}
+
+/* Headings */
+h1 {
+  color: #89b4fa; /* Light blue */
+}
+
+h2 {
+  color: #74c7ec; /* Cyan */
+}
+
+h3 {
+  color: #94e2d5; /* Aqua */
+}
+
+h4 {
+  color: #a6e3a1; /* Green */
+}
+
+/* Bullet Points */
+ul > li {
+  color: #f5c2e7; /* Pink */
+}
+
+ul > li > ul > li {
+  color: #f38ba8; /* Red */
+}
+
+ul > li > ul > li > ul > li {
+  color: #fab387; /* Orange */
+}
+
+/* Blockquotes */
+blockquote {
+  background-color: #45475a; /* Dark gray background */
+  color: #f9e2af; /* Soft yellow text */
+  border-left: 5px solid #f5a97f; /* Peach border */
+  padding: 10px;
+  margin: 0;
+}
+
+/* Links */
+a {
+  color: #89dceb;
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+/* Center-align images with enhanced styling */
+img {
+  display: block;
+  margin: 20px auto; /* Center-align with spacing */
+  max-width: 90%; /* Keep images responsive and fit within the screen */
+  height: auto; /* Maintain aspect ratio */
+  border-radius: 10px; /* Rounded corners */
+  border: 3px solid #313244; /* Subtle border matching dark theme */
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.6), 0 4px 6px rgba(255, 255, 255, 0.1); /* Depth with light glow */
+  transition: transform 0.3s ease, opacity 0.3s ease; /* Smooth effects */
+  opacity: 0.95; /* Slight transparency for blending into dark background */
+}
+
+/* Hover effect for interactivity */
+img:hover {
+  transform: scale(1.08); /* Zoom in slightly */
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.8), 0 6px 8px rgba(255, 255, 255, 0.2); /* Brighter shadow */
+  opacity: 1; /* Make image fully visible on hover */
+}
+
+/* Optional: Add captions for images */
+figure {
+  text-align: center;
+  margin: 20px auto;
+}
+
+figcaption {
+  color: #a6adc8; /* Light gray for captions */
+  font-size: 0.9em;
+  margin-top: 8px;
+  font-style: italic;
+}
+/* Code Block Container */
+pre {
+  background-color: #1e1e2e; /* Match dark theme background */
+  color: #cdd6f4; /* Light text color */
+  padding: 12px 16px; /* Add padding inside the block */
+  border-radius: 8px; /* Rounded corners */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.6); /* Subtle shadow for depth */
+  border: 1px solid #313244; /* Thin border to separate the block */
+  overflow-x: auto; /* Prevent horizontal scrolling */
+  font-family: "Fira Code", monospace; /* Use a coding font for readability */
+  font-size: 14px; /* Adjust font size for clarity */
+  line-height: 1.5; /* Increase line spacing for readability */
+  white-space: pre-wrap; /* Enable line wrapping for long lines */
+  word-wrap: break-word; /* Break long words if necessary */
+}
+/* Inline Code */
+code {
+  background-color: #45475a; /* Subtle background for inline code */
+  color: #89b4fa; /* Light blue for inline code text */
+  padding: 2px 6px; /* Padding for inline code */
+  border-radius: 4px; /* Rounded corners for inline code */
+  font-family: "Fira Code", monospace; /* Coding font */
+  font-size: 14px; /* Consistent font size */
+}
+/* Highlighted text */
+.highlight {
+  background-color: #ffcc80; /* Soft yellow background */
+  color: #1e1e2e; /* Dark text for contrast */
+  padding: 2px 4px; /* Add some padding for emphasis */
+  border-radius: 4px; /* Rounded corners for a smoother look */
+  font-weight: bold; /* Make the text stand out */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3); /* Optional shadow for depth */
+}
