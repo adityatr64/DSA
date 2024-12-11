@@ -43,6 +43,12 @@
     - [Tree](#tree)
       - [Binary Tree](#binary-tree)
       - [N-ary Tree](#n-ary-tree)
+  - [UNIT - 3](#unit---3)
+    - [Binary Search](#binary-search)
+      - [Implementation Using Arrays](#implementation-using-arrays)
+      - [Dynamic Allocation](#dynamic-allocation)
+    - [Expression Tree](#expression-tree)
+    - [Threaded BST](#threaded-bst)
 
 ---
 
@@ -2244,6 +2250,377 @@ int survivor(struct node **head, int n){
   ![](./images/Forestp2.png)
     <Figure>↓</figure>
     ![](./images/forestfina.png)
+
+## UNIT - 3
+
+### Binary Search
+
+- A Binary tree where the left child is smaller than the root and right child is greater than the root
+
+![BST](./images/BST.png)
+
+#### Implementation Using Arrays
+
+![](./images/bstArray.png)
+
+```c
+typedef struct node
+{
+    int data; // Holds the data value of the node
+    int flag; // Indicates if the node is active (1) or empty (0)
+} NODE;
+```
+
+- In an array-based BST:
+
+  - Nodes are stored in an array, and the indices represent their position.
+  - The root node is at index 0.
+  - For any node at index i:
+    - Left child: `2*i + 1`
+    - Right child: `2*i + 2`
+    - Parent: `(i - 1) / 2`
+
+- Insertion
+
+```c
+void insert(NODE *bst, int data, int index)
+{
+    if (bst[index].flag == 0 && index < SIZE)
+    {
+        bst[index].data = data;  // Assign data to node
+        bst[index].flag = 1;     // Mark node as active
+    }
+    // Go to left child
+    else if (data < bst[index].data && index < SIZE)
+    {
+        index = 2 * index + 1;
+        // Recursive call for left subtree
+        insert(bst, data, index);
+    }
+    // Go to right child
+    else if (data > bst[index].data && index < SIZE)
+    {
+        index = 2 * index + 2;
+        // Recursive call for right subtree
+        insert(bst, data, index);
+    }
+    else
+    {
+        // Handle duplicate or out-of-bounds cases
+        printf("\nInsertion is NOT possible.");
+    }
+}
+```
+
+- Inorder Trversal
+
+```c
+void inorder(NODE *bst, int i)
+{
+    if (bst[i].flag == 1 && i < SIZE)// Process only active nodes
+    {
+        // Recursive call for left subtree
+        inorder(bst, 2 * i + 1);
+        // Print current node data
+        printf("%d ", bst[i].data);
+        // Recursive call for right subtree
+        inorder(bst, 2 * i + 2);
+    }
+}
+```
+
+#### Dynamic Allocation
+
+- In a dynamically allocated BST:
+  - Each node contains data, pointers to the left and right child, and possibly a parent pointer.
+  - This method is more flexible and doesnt require a fixed size like arrays
+
+```c
+typedef struct node
+{
+    int data;              // Data value of the node
+    struct node *left;     // Pointer to the left child
+    struct node *right;    // Pointer to the right child
+} NODE;
+```
+
+![](./images/BSTNODE.png)
+
+- Helpers
+
+```c
+NODE *FindMin(NODE *root)
+{
+    // Traverse to the leftmost node
+    while (root->left != NULL)
+        root = root->left;
+    return root;
+}
+```
+
+- Insertion
+
+```c
+NODE *Insert(NODE *root, int data)
+{
+    if (root == NULL)
+    {
+        // Create a new node if tree is empty
+        NODE *newNode = (NODE *)malloc(sizeof(NODE));
+        newNode->data = data;
+        newNode->left = newNode->right = NULL;
+        return newNode;
+    }
+    // Insert into the left subtree
+    else if (data <= root->data)
+        root->left = Insert(root->left, data);
+    else
+    // Insert into the right subtree
+        root->right = Insert(root->right, data);
+    return root; // Return the updated root
+}
+```
+
+- Deletion
+
+```c
+NODE *Delete(NODE *root, int data)
+{
+    if (root == NULL)
+    // Base case: tree is empty or node not found
+        return root;
+
+    // Traverse to find the node to delete
+    if (data < root->data)
+    // Search left subtree
+        root->left = Delete(root->left, data);
+    else if (data > root->data)
+    // Search right subtree
+        root->right = Delete(root->right, data);
+    else
+    {
+        // Node found: handle three cases
+
+        // Case 1: No children (leaf node)
+        if (root->left == NULL && root->right == NULL)
+        {
+            free(root); // Delete the node
+            root = NULL;
+        }
+        // Case 2: One child (right child exists)
+        else if (root->left == NULL)
+        {
+            NODE *temp = root;
+            // Replace node with its right child
+            root = root->right;
+            // Free memory
+            free(temp);
+        }
+        // Case 2: One child (left child exists)
+        else if (root->right == NULL)
+        {
+            NODE *temp = root;
+            // Replace node with its left child
+            root = root->left;
+            // Free memory
+            free(temp);
+        }
+        // Case 3: Two children
+        else
+        {
+            // Find inorder successor
+            NODE *temp = FindMin(root->right);
+            // Replace data with successor's data
+            root->data = temp->data;
+            // Delete the successor
+            root->right = Delete(root->right, temp->data);
+        }
+    }
+    return root; // Return the updated root
+}
+```
+
+- Inorder
+
+```c
+void Inorder(NODE *root)
+{
+    if (root == NULL)
+        return; // Base case: tree is empty
+
+    Inorder(root->left);       // Traverse the left subtree
+    printf("%d ", root->data); // Print the current node's data
+    Inorder(root->right);      // Traverse the right subtree
+}
+```
+
+### Expression Tree
+
+- An expression tree is a binary tree where:
+  - Leaves represent operands (numbers in this case).
+  - Internal nodes represent operators (like `+, -, *, /`).
+- The tree evaluates expressions by recursively calculating from the leaves up to the root.
+  For example, the postfix expression 567\*+8- means:
+
+1. Multiply `6 * 7` (from `567*`).
+2. Add the result to `5` (`5 + 42`).
+3. Subtract `8` (`47 - 8`).
+
+- The tree looks like this:
+
+```cpp
+       -
+     /   \
+    +     8
+   / \
+  5   *
+ / \
+6   7
+```
+
+- Structure
+
+```c
+
+// Definition of a binary tree node for expression tree
+typedef struct treeNode
+{
+    int utype; // 1 for operand, 2 for operator
+    union
+    {
+        char operater; // Operator (e.g., '+', '-', '*', '/')
+        float operand; // Operand (e.g., numbers)
+    } u;
+    struct treeNode *left;  // Left child
+    struct treeNode *right; // Right child
+} NODE;
+```
+
+- Construction
+
+1. Input:
+
+- A postfix expression string (char exp[]), e.g., "567\*+8-".
+
+2. Logic:
+
+- Traverse the string, processing each character:
+  - If it's a digit: Create a node with the operand and push it onto the stack.
+  - If it's an operator: Create a node with the operator, pop the top two nodes from the stack as its right and left children, then push the new node back onto the stack.
+
+```c
+NODE *construct(char exp[])
+{
+    NODE *nn, *stack[MAX]; // Array of pointers for the stack
+    int i = 0;
+
+    while (exp[i])
+    {
+        if (isdigit(exp[i]))
+        { // Operand case
+            nn = (NODE *)malloc(sizeof(NODE));
+            // Operand type
+            nn->utype = 1;
+            // Convert character to float
+            nn->u.operand = exp[i] - '0';
+            // No children for operands
+            nn->left = nn->right = NULL;
+            // Push to stack
+            push(nn, stack);
+        }
+        else
+        { // Operator case
+            nn = (NODE *)malloc(sizeof(NODE));
+            nn->utype = 2;                  // Operator type
+            nn->u.operater = exp[i];        // Store the operator
+            nn->right = pop(stack);         // Right child
+            nn->left = pop(stack);          // Left child
+            if (nn->right == NULL || nn->left == NULL)
+            { // Check for invalid expression
+                printf("Invalid expression\n");
+                free(nn);
+                return NULL;
+            }
+            push(nn, stack);         //Push the new subtree root
+        }
+        i++; // Move to the next character in the expression
+    }
+    return pop(stack); // Final pop gives the root of the tree
+}
+```
+
+- Helpers
+
+```c
+float calculate(float x, char op, float y)
+{
+    float res;
+    switch (op)
+    {
+    case '+':
+        res = x + y;
+        break;
+    case '-':
+        res = x - y;
+        break;
+    case '*':
+        res = x * y;
+        break;
+    case '/':
+        if (y != 0)
+            res = x / y;
+        else
+        {
+            printf("Division by zero error\n");
+            exit(1); // Exit on division by zero
+        }
+        break;
+    default:
+        printf("Invalid operator\n");
+        exit(1); // Exit on invalid operator
+    }
+    return res;
+}
+float evaluate(NODE *bst)
+{
+    if (bst->utype == 1) // If it's an operand, return its value
+        return bst->u.operand;
+
+    // Recursively evaluate the left subtree
+    float x = evaluate(bst->left);
+    // Recursively evaluate the right subtree
+    float y = evaluate(bst->right);
+    // Perform the operation
+    return calculate(x, bst->u.operater, y);
+}
+```
+
+- Inorder
+
+```c
+void inorder(NODE *bst)
+{
+    if (bst != NULL)
+    {
+        inorder(bst->left); // Traverse left subtree
+        if (bst->utype == 1)
+            printf("%g ", bst->u.operand); // Print operand
+        else
+            printf("%c ", bst->u.operater); // Print operator
+        inorder(bst->right); // Traverse right subtree
+    }
+}
+```
+
+### Threaded BST
+
+A Threaded Binary Search Tree (TBST) improves the efficiency of in-order traversal by replacing NULL
+pointers in leaf nodes with threads. These threads point to the in-order predecessor (on the left) or in-
+order successor (on the right). This eliminates the need for stacks or recursion during traversal.
+
+- In this implementation:
+  - lthread = 1: The left pointer is a thread to the in-order predecessor.
+  - rthread = 1: The right pointer is a thread to the in-order successor.
 
 ---
 
