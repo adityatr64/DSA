@@ -49,6 +49,7 @@
       - [Dynamic Allocation](#dynamic-allocation)
     - [Expression Tree](#expression-tree)
     - [Threaded BST](#threaded-bst)
+      - [Three types](#three-types)
 
 ---
 
@@ -2614,13 +2615,146 @@ void inorder(NODE *bst)
 
 ### Threaded BST
 
-A Threaded Binary Search Tree (TBST) improves the efficiency of in-order traversal by replacing NULL
-pointers in leaf nodes with threads. These threads point to the in-order predecessor (on the left) or in-
-order successor (on the right). This eliminates the need for stacks or recursion during traversal.
+A Threaded Binary Search Tree (TBST) improves the efficiency of in-order traversal by replacing NULL pointers in leaf nodes with threads. These threads point to the in-order predecessor (on the left) or in-order successor (on the right). This eliminates the need for stacks or recursion during traversal.
+
+#### Three types
+
+- Left threaded
+
+![LEFT](./images/LTBST.png)
+
+- Right Threaded
+
+![RIGHT](./images/RTBST.png)
+
+- Double Threaded
+
+![Double](./images/DTBST.png)
 
 - In this implementation:
   - lthread = 1: The left pointer is a thread to the in-order predecessor.
   - rthread = 1: The right pointer is a thread to the in-order successor.
+
+```C
+typedef struct node {
+    int data;
+    struct node *left;
+    struct node *right;
+    int lthread;// (1: thread, 0: child)
+    int rthread;// (1: thread, 0: child)
+} NODE;
+```
+
+- Create
+
+```c
+NODE* createNode(int data) {
+    NODE *nn = (NODE*)malloc(sizeof(NODE));
+    nn->data = data;
+    nn->lthread = 1;  // By default, threads are present
+    nn->rthread = 1;
+    nn->left = NULL;
+    nn->right = NULL;
+    return nn;
+}
+```
+
+- Insertion
+  - Create a new node `newNode` with data `key`.
+  - If the tree is empty, set `root = newNode` and return.
+  - Initialize `current = root` and `parent = NULL`.
+  - While `current` is not NULL:
+    - Set `parent = current`.
+    - If `key < current->data`:
+      - If `current->lthread == 0`, move left (`current = current->left`).
+      - Else, break.
+    - Else if `key > current->data`:
+      - If `current->rthread == 0`, move right (`current = current->right`).
+      - Else, break.
+    - If `key == current->data`, return (duplicate key).
+  - Insert `newNode`:
+    - If `key < parent->data`, insert as left child:
+      - Set `newNode->left = parent->left`, `newNode->right = parent`, update `parent->left = newNode`.
+      - Set `parent->lthread = 0`.
+    - Else, insert as right child:
+      - Set `newNode->left = parent`, `newNode->right = parent->right`, update `parent->right = newNode`.
+      - Set `parent->rthread = 0`.
+
+```c
+NODE* insertNode(NODE *root, int data) {
+    NODE *t = root, *parent = NULL, *nn;
+    nn = createNode(data);
+
+    if (root == NULL) {  // Tree is empty
+        root = nn;
+        return root;
+    }
+
+    // Find the parent where the new node should be inserted
+    while (t != NULL) {
+        parent = t;
+        if (data < t->data) {
+            if (t->lthread == 0)
+                t = t->left;
+            else
+                break;
+        } else if (data > t->data) {
+            if (t->rthread == 0)
+                t = t->right;
+            else
+                break;
+        } else {
+            printf("Duplicate key\n");
+            return root;
+        }
+    }
+
+    // Insert the node in the appropriate position
+    if (data < parent->data) {
+        nn->left = parent->left;  // Inorder predecessor
+        nn->right = parent;       // Inorder successor
+        parent->left = nn;
+        parent->lthread = 0;      // Left child exists now
+    } else {
+        nn->left = parent;        // Inorder predecessor
+        nn->right = parent->right;// Inorder successor
+        parent->right = nn;
+        parent->rthread = 0;      // Right child exists now
+    }
+
+    return root;
+}
+```
+
+- Deletion
+
+  - Start from the root and find the node to be deleted (`targetNode`).
+  - If the node is not found, return (key not found).
+  - If the node has no children (leaf node):
+    - If it’s the left child, set `parent->left` to `targetNode->left` (thread).
+    - If it’s the right child, set `parent->right` to `targetNode->right` (thread).
+    - Free `targetNode`.
+  - If the node has one child:
+    - If the node has a left child, update `parent->left` to point to the left child.
+    - If the node has a right child, update `parent->right` to point to the right child.
+    - Free `targetNode`.
+  - If the node has two children:
+    - Find the inorder successor (`successor`).
+    - Replace `targetNode->data` with `successor->data`.
+    - Delete the `successor` node (which will fall under Case 1 or Case 2).
+
+- Height of a Binary Tree
+
+```c
+int height(struct tnode *t)
+  {
+    if(t==NULL)
+      return -1;
+    if((t->left==NULL)&&(t->right==NULL))
+      return 0;
+    return (1+max(height(r->left),height(r->right)));
+  }
+```
 
 ---
 
